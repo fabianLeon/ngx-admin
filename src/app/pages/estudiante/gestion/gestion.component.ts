@@ -82,7 +82,7 @@ export class GestionComponent {
     this.estudianteService.get('roll', '')
       .subscribe(res => {
         this.roles = res;
-        console.log(this.roles);
+        // console.log(this.roles);
         this.roles.unshift(this.rolSelected);
       });
   }
@@ -103,7 +103,7 @@ export class GestionComponent {
   removeRol() {
     this.selected.forEach(element => {
       element.roles.forEach(rol => {
-        console.log(rol)
+        // console.log(rol)
         if (rol.Roll.Id === this.rolSelected.Id) {
           this.estudianteService.delete('persona_roll', rol)
             .subscribe(res => {
@@ -119,7 +119,7 @@ export class GestionComponent {
       event.newData.Activo = 1;
       this.estudianteService.post('persona', event.newData)
         .subscribe(res => {
-          console.log(res)
+          // console.log(res)
           event.confirm.resolve();
         });
     } else {

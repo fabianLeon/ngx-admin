@@ -15,7 +15,7 @@ export class EstudianteService {
     }
 
     get(endpoint, params) {
-        return this.http.get(path + endpoint + '?'+ params);
+        return this.http.get(path + endpoint + '?' + params);
     }
     post(endpoint, element) {
         return this.http.post(path + endpoint, element, httpOptions);
