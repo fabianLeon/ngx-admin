@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { EstudianteService } from '../../../@core/data/estudiante.service';
+import { LocalDataSource } from 'ng2-smart-table';
 
 @Component({
   selector: 'ngx-gestion',
@@ -13,9 +14,13 @@ import { EstudianteService } from '../../../@core/data/estudiante.service';
 })
 
 export class GestionComponent {
+  roles: any;
+  selected: any;
+  rolSelected: any;
   data: any;
   column: any;
   settings = {
+    selectMode: 'multi',
     add: {
       addButtonContent: '<i class="nb-plus"></i>',
       createButtonContent: '<i class="nb-checkmark"></i>',
@@ -63,33 +68,96 @@ export class GestionComponent {
       },
     },
   };
+  source: LocalDataSource = new LocalDataSource();
 
   constructor(private estudianteService: EstudianteService) {
     this.data = [];
-    this.estudianteService.get()
+    this.rolSelected = { Id: 0, Nombre: 'Seleccione' };
+    this.estudianteService.get('persona', '')
       .subscribe(res => {
         this.data = res;
+        this.source.load(this.data);
+      });
+
+    this.estudianteService.get('roll', '')
+      .subscribe(res => {
+        this.roles = res;
+        console.log(this.roles);
+        this.roles.unshift(this.rolSelected);
       });
   }
 
-  onCreateConfirm(event): void {
-      if (window.confirm('Seguro que desea crear a ' + event.newData.Nombres)) {
-        event.newData.Activo = 1;
-        console.log(event.newData);
-        this.estudianteService.post(event.newData)
-          .subscribe(res => {
-            console.log(res);
-            event.confirm.resolve();
-          });
-      } else {
-        event.confirm.reject();
+  addRol() {
+    this.selected.forEach(element => {
+      const data = {
+        Persona: element,
+        Roll: this.rolSelected,
       }
+      this.estudianteService.post('persona_roll', data)
+        .subscribe(res => {
+          this.getRolesById();
+        });
+    });
+  }
+
+  removeRol() {
+    this.selected.forEach(element => {
+      element.roles.forEach(rol => {
+        console.log(rol)
+        if (rol.Roll.Id === this.rolSelected.Id) {
+          this.estudianteService.delete('persona_roll', rol)
+            .subscribe(res => {
+              this.getRolesById();
+            });
+        }
+      });
+    });
+  }
+
+  onCreateConfirm(event): void {
+    if (window.confirm('Seguro que desea crear a ' + event.newData.Nombres)) {
+      event.newData.Activo = 1;
+      this.estudianteService.post('persona', event.newData)
+        .subscribe(res => {
+          console.log(res)
+          event.confirm.resolve();
+        });
+    } else {
+      event.confirm.reject();
     }
+  }
+
+  onSelected(event): void {
+    this.selected = event.selected;
+    this.getRolesById();
+  }
+
+  getRolesById() {
+    this.selected.forEach(element => {
+      const query = 'query=Persona.Id:' + element.Id;
+      this.estudianteService.get('persona_roll', new URLSearchParams(query))
+        .subscribe(res => {
+          element.roles = res;
+        });
+    });
+  }
+
+  onDeleteConfirm(event): void {
+    if (window.confirm('Seguro que desea eliminar a : ' +
+      event.data.Nombres)) {
+      this.estudianteService.delete('persona', event.data)
+        .subscribe(res => {
+          event.confirm.resolve();
+        });
+    } else {
+      event.confirm.reject();
+    }
+  }
 
   onEditConfirm(event): void {
-    if (window.confirm('Seguro que desea editar el activo Modelo: ' +
+    if (window.confirm('Seguro que desea editar a : ' +
       event.data.Nombres)) {
-      this.estudianteService.put(event.newData)
+      this.estudianteService.put('persona', event.newData)
         .subscribe(res => {
           event.confirm.resolve();
         });

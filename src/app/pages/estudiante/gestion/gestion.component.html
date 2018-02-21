@@ -1,9 +1,59 @@
-<nb-card>
-  <nb-card-header>
-    Estudiantes
-  </nb-card-header>
-  <nb-card-body>
-      <ng2-smart-table [settings]="settings" [source]="data" (editConfirm)="onEditConfirm($event)"  (createConfirm)="onCreateConfirm($event)" >
-      </ng2-smart-table>
-  </nb-card-body>
-</nb-card>
+<div class="row">
+  <div class="col-md-12 col-lg-12">
+    <nb-card size="small">
+      <nb-tabset>
+        <nb-tab tabTitle="Personas">
+          <nb-card>
+            <nb-card-body>
+              <ng2-smart-table [settings]="settings" [source]="source" (editConfirm)="onEditConfirm($event)" (userRowSelect)="onSelected($event)"
+                (deleteConfirm)="onDeleteConfirm($event)" (createConfirm)="onCreateConfirm($event)">
+              </ng2-smart-table>
+            </nb-card-body>
+          </nb-card>
+        </nb-tab>
+        <nb-tab tabTitle="Roles" (click)="getRolesById()">
+          <br>
+          <div class="row">
+            <div class="col-md-4">
+              <nb-card>
+                <nb-card-body>
+                  <ol>
+                    <li *ngFor="let person of selected">
+                      {{person.Nombres + " " + person.Apellidos}}
+                      <ul>
+                        <li *ngFor="let rol of person.roles">
+                          <small>{{rol.Roll.Nombre}} ({{rol.Roll.Descripcion}})</small>
+                        </li>
+                      </ul>
+                    </li>
+                  </ol>
+                </nb-card-body>
+              </nb-card>
+            </div>
+            <div class="col-md-4">
+              <nb-card>
+                <nb-card-body>
+                  <select [(ngModel)]="rolSelected" class="form-control" [ngModelOptions]="{standalone: true}">
+                    <option class="form-control" *ngFor="let item of roles" [ngValue]="item" [selected]="rolSelected.Id === item.Id">{{item.Nombre}}</option>
+                  </select>
+                </nb-card-body>
+              </nb-card>
+            </div>
+            <div class="col-md-4">
+              <nb-card>
+                <nb-card-body>
+                  <div align="center">
+                    <button class="btn btn-primary btn-tiny" (click)="addRol()">Agregar</button>
+                    <button class="btn btn-success btn-tiny" (click)="removeRol()">Quitar</button>
+                  </div>
+                </nb-card-body>
+              </nb-card>
+            </div>
+          </div>
+        </nb-tab>
+        <nb-tab tabTitle="Simple Tab #3">
+          <span>Content #3</span>
+        </nb-tab>
+      </nb-tabset>
+    </nb-card>
+  </div>

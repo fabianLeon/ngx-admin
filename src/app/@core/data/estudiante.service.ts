@@ -5,7 +5,7 @@ const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
 
-const path = 'http://localhost:8080/v1/persona/';
+const path = 'http://localhost:8080/v1/';
 
 
 @Injectable()
@@ -14,18 +14,16 @@ export class EstudianteService {
     constructor(private http: HttpClient) {
     }
 
-    get() {
-        return this.http.get(path);
+    get(endpoint, params) {
+        return this.http.get(path + endpoint + '?'+ params);
     }
-    post(element) {
-        console.log(element)
-        return this.http.post(path, element, httpOptions);
+    post(endpoint, element) {
+        return this.http.post(path + endpoint, element, httpOptions);
     }
-    put(element) {
-        const body = JSON.stringify(element);
-        return this.http.put(path + element.Id, body, httpOptions);
+    put(endpoint, element) {
+        return this.http.put(path + endpoint + '/' + element.Id, element, httpOptions);
     }
-    delete(element) {
-        return this.http.delete(path + element.id);
+    delete(endpoint, element) {
+        return this.http.delete(path + endpoint + '/' + element.Id);
     }
 };
